@@ -1,0 +1,2 @@
+# StrikTossen
+Find din pind
