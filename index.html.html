@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strikkepind Konverter</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: 'Georgia', serif;
+    background: #fdf6f0;
+    min-height: 100vh;
+    padding: 24px 16px;
+    color: #3a2e2a;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 1.6rem;
+    color: #7a3e2e;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: #9e7060;
+    font-size: 0.9rem;
+    margin-bottom: 28px;
+    font-style: italic;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 22px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 12px rgba(120,60,40,0.08);
+    border: 1px solid #f0e0d6;
+  }
+
+  .card-title {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #b07060;
+    margin-bottom: 16px;
+    font-family: sans-serif;
+    font-weight: 600;
+  }
+
+  .param-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .param-label {
+    flex: 1;
+    font-size: 0.92rem;
+    color: #5a3e36;
+    line-height: 1.3;
+  }
+
+  .param-label span {
+    display: block;
+    font-size: 0.75rem;
+    color: #9e7060;
+    font-style: italic;
+  }
+
+  .param-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 120px;
+    height: 6px;
+    border-radius: 3px;
+    background: #f0e0d6;
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #c05040;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+
+  .value-display {
+    background: #fdf6f0;
+    border: 1px solid #e8d0c4;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #7a3e2e;
+    min-width: 60px;
+    text-align: center;
+    font-family: sans-serif;
+  }
+
+  .result-card {
+    background: linear-gradient(135deg, #7a3e2e 0%, #c05040 100%);
+    border-radius: 16px;
+    padding: 22px 20px;
+    color: white;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 18px rgba(120,60,40,0.25);
+  }
+
+  .result-card .card-title {
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 16px;
+  }
+
+  .result-main {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+
+  .result-number {
+    font-size: 3rem;
+    font-weight: bold;
+    font-family: sans-serif;
+    line-height: 1;
+  }
+
+  .result-unit {
+    font-size: 1.1rem;
+    opacity: 0.85;
+  }
+
+  .result-explanation {
+    font-size: 0.83rem;
+    opacity: 0.8;
+    margin-top: 8px;
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  .needle-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .needle-btn {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 20px;
+    padding: 5px 14px;
+    color: white;
+    font-size: 0.82rem;
+    cursor: pointer;
+    font-family: sans-serif;
+    transition: background 0.15s;
+  }
+
+  .needle-btn.best {
+    background: rgba(255,255,255,0.9);
+    color: #7a3e2e;
+    font-weight: 700;
+    border-color: white;
+  }
+
+  .needle-btn:hover {
+    background: rgba(255,255,255,0.3);
+  }
+
+  .needle-btn.best:hover {
+    background: white;
+  }
+
+  .formula-card {
+    background: #f8f0eb;
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 0.8rem;
+    color: #7a5a50;
+    line-height: 1.6;
+    border: 1px solid #ead8cc;
+    font-family: sans-serif;
+  }
+
+  .formula-card b { color: #7a3e2e; }
+
+  .divider {
+    height: 1px;
+    background: #f0e0d6;
+    margin: 10px 0;
+  }
+
+  .gauge-visual {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    align-items: flex-end;
+  }
+
+  .gauge-bar {
+    flex: 1;
+    border-radius: 4px 4px 0 0;
+    transition: height 0.3s ease;
+  }
+
+  @media (max-width: 400px) {
+    input[type=range] { width: 90px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>🧶 Strikkepind Konverter</h1>
+<p class="subtitle">Find den rigtige strikkepind til dit garn</p>
+
+<!-- OPSKRIFT -->
+<div class="card">
+  <div class="card-title">📋 Opskriften kræver</div>
+
+  <div class="param-row">
+    <div class="param-label">
+      Garnets løbelængde
+      <span>meter pr. 50 gram</span>
+    </div>
+    <div class="param-controls">
+      <input type="range" id="orig_meters" min="100" max="500" step="10" value="250">
+      <div class="value-display"><span id="orig_meters_val">250</span>m</div>
+    </div>
+  </div>
+
+  <div class="param-row">
+    <div class="param-label">
+      Strikkepind
+      <span>anbefalet i opskriften</span>
+    </div>
+    <div class="param-controls">
+      <input type="range" id="orig_needle" min="1.5" max="10" step="0.5" value="3">
+      <div class="value-display"><span id="orig_needle_val">3,0</span>mm</div>
+    </div>
+  </div>
+</div>
+
+<!-- MIT GARN -->
+<div class="card">
+  <div class="card-title">🎀 Mit garn har</div>
+
+  <div class="param-row">
+    <div class="param-label">
+      Løbelængde
+      <span>meter pr. 50 gram</span>
+    </div>
+    <div class="param-controls">
+      <input type="range" id="my_meters" min="100" max="500" step="10" value="200">
+      <div class="value-display"><span id="my_meters_val">200</span>m</div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTAT -->
+<div class="result-card">
+  <div class="card-title">✨ Anbefalet strikkepind</div>
+  <div class="result-main">
+    <div class="result-number" id="result_needle">2,5</div>
+    <div class="result-unit">mm</div>
+  </div>
+  <div id="result_explanation" class="result-explanation"></div>
+
+  <div class="needle-options" id="needle_options"></div>
+</div>
+
+<!-- FORKLARING -->
+<div class="card">
+  <div class="card-title">🔢 Sådan beregnes det</div>
+  <div class="formula-card" id="formula_box"></div>
+</div>
+
+<script>
+  const NEEDLES = [1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 8, 9, 10];
+
+  function fmt(n) {
+    return n.toFixed(1).replace('.', ',');
+  }
+
+  function calcIdealNeedle(origMeters, origNeedle, myMeters) {
+    // Tykkere garn (færre m/50g) → større pind
+    // Ratio: tyndere garn = kortere løbelængde per gram
+    // needle ∝ sqrt(meterage_ratio) er en god approksimation brugt i garnindustrien
+    const ratio = origMeters / myMeters;
+    return origNeedle * Math.sqrt(ratio);
+  }
+
+  function findClosest(ideal) {
+    let best = NEEDLES[0];
+    let bestDist = Math.abs(ideal - best);
+    for (const n of NEEDLES) {
+      const d = Math.abs(ideal - n);
+      if (d < bestDist) { bestDist = d; best = n; }
+    }
+    return best;
+  }
+
+  function getNearby(ideal) {
+    const sorted = [...NEEDLES].sort((a, b) => Math.abs(a - ideal) - Math.abs(b - ideal));
+    return sorted.slice(0, 5);
+  }
+
+  function update() {
+    const origMeters = parseFloat(document.getElementById('orig_meters').value);
+    const origNeedle = parseFloat(document.getElementById('orig_needle').value);
+    const myMeters   = parseFloat(document.getElementById('my_meters').value);
+
+    document.getElementById('orig_meters_val').textContent = origMeters;
+    document.getElementById('orig_needle_val').textContent = fmt(origNeedle);
+    document.getElementById('my_meters_val').textContent = myMeters;
+
+    const ideal  = calcIdealNeedle(origMeters, origNeedle, myMeters);
+    const closest = findClosest(ideal);
+    const nearby  = getNearby(ideal);
+
+    document.getElementById('result_needle').textContent = fmt(closest);
+
+    const diff = myMeters - origMeters;
+    const direction = diff < 0 ? 'kortere' : 'længere';
+    const thicker = diff < 0 ? 'tykkere' : 'tyndere';
+    document.getElementById('result_explanation').textContent =
+      `Dit garn er ${Math.abs(diff)}m/${direction} pr. 50g → altså ${thicker}. ` +
+      `Den præcise beregning giver ${fmt(ideal)} mm — nærmeste standardpind er ${fmt(closest)} mm.`;
+
+    // Needle buttons
+    const container = document.getElementById('needle_options');
+    container.innerHTML = '';
+    for (const n of nearby) {
+      const btn = document.createElement('div');
+      btn.className = 'needle-btn' + (n === closest ? ' best' : '');
+      const diff_pct = ((n - ideal) / ideal * 100).toFixed(0);
+      const sign = diff_pct >= 0 ? '+' : '';
+      btn.textContent = `${fmt(n)} mm  (${sign}${diff_pct}%)`;
+      container.appendChild(btn);
+    }
+
+    // Formula
+    const ratio = (origMeters / myMeters).toFixed(3);
+    const sqrtRatio = Math.sqrt(origMeters / myMeters).toFixed(3);
+    document.getElementById('formula_box').innerHTML = `
+      <b>Formel:</b> ny pind = opskriftens pind × √(opskriftens m/50g ÷ mit garns m/50g)<br><br>
+      = ${fmt(origNeedle)} × √(${origMeters} ÷ ${myMeters})<br>
+      = ${fmt(origNeedle)} × √${ratio}<br>
+      = ${fmt(origNeedle)} × ${sqrtRatio}<br>
+      = <b>${fmt(ideal)} mm</b> → nærmeste: <b>${fmt(closest)} mm</b><br><br>
+      <i>Kvadratrods-formlen er en tommelfingerregel brugt i garnindustrien: masketætheden ændrer sig omtrent proportionalt med √(tykkelsesforholdet).</i>
+    `;
+  }
+
+  document.querySelectorAll('input[type=range]').forEach(el => {
+    el.addEventListener('input', update);
+  });
+
+  update();
+</script>
+</body>
+</html>
